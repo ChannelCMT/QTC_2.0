@@ -1,0 +1,48 @@
+missing module named resource - imported by posix, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named posix - imported by os, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named _posixsubprocess - imported by subprocess, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named 'org.python' - imported by pickle, xml.sax, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named ce - imported by os, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named readline - imported by cmd, code, pdb, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+excluded module named _frozen_importlib - imported by importlib, importlib.abc, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named _frozen_importlib_external - imported by importlib._bootstrap, importlib, importlib.abc, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named _winreg - imported by platform, requests.utils, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named _scproxy - imported by urllib.request
+missing module named java - imported by platform, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named 'java.lang' - imported by platform, xml.sax._exceptions, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named vms_lib - imported by platform, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named termios - imported by tty, getpass, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named urllib.pathname2url - imported by urllib, pyqrcode
+missing module named urllib.proxy_bypass_environment - imported by urllib, requests.compat
+missing module named urllib.urlencode - imported by urllib, requests.compat
+missing module named urllib.getproxies - imported by urllib, requests.compat
+missing module named urllib.unquote_plus - imported by urllib, requests.compat
+missing module named urllib.proxy_bypass - imported by urllib, requests.compat
+missing module named urllib.getproxies_environment - imported by urllib, requests.compat
+missing module named urllib.quote_plus - imported by urllib, requests.compat
+missing module named urllib.quote - imported by urllib, asn1crypto._iri, requests.compat
+missing module named urllib.unquote - imported by urllib, asn1crypto._iri, requests.compat
+missing module named grp - imported by shutil, tarfile, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named _dummy_threading - imported by dummy_threading, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named pwd - imported by posixpath, shutil, tarfile, http.server, webbrowser, netrc, getpass, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named org - imported by copy, G:\¿œƒ–∫¢python_project\web\wechat\wechat_auto_talking.py
+missing module named backports - imported by urllib3.packages.ssl_match_hostname
+missing module named _abcoll - imported by urllib3.packages.ordered_dict
+missing module named dummy_thread - imported by urllib3.packages.ordered_dict
+missing module named thread - imported by urllib3.packages.ordered_dict
+missing module named StringIO - imported by urllib3.packages.six, six, requests.compat
+missing module named Cookie - imported by requests.compat
+missing module named cookielib - imported by requests.compat
+missing module named urllib2 - imported by requests.compat
+missing module named urlparse - imported by asn1crypto._iri, requests.compat, pyqrcode
+missing module named simplejson - imported by requests.compat
+missing module named Queue - imported by urllib3.connectionpool, itchat.storage.messagequeue, itchat.components.register
+missing module named 'urllib3.packages.six.moves' - imported by urllib3.exceptions, urllib3.connectionpool, urllib3.connection, urllib3.util.response, urllib3.request, urllib3.response, urllib3.poolmanager
+missing module named win_inet_pton - imported by socks
+runtime module named six.moves - imported by cryptography.hazmat.backends.openssl.decode_asn1, cryptography.x509.general_name
+missing module named UserDict - imported by asn1crypto._ordereddict
+missing module named cStringIO - imported by asn1crypto.core
+missing module named copy_reg - imported by cStringIO
+missing module named cpngfilters - imported by png
+missing module named httplib - imported by itchat.components.login
+missing module named HTMLParser - imported by itchat.utils

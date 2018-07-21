@@ -1,0 +1,123 @@
+var menuList = [{
+                't': '投资参考','u': 'http://vip.stock.finance.sina.com.cn/q/go.php/',
+                'c':[
+                    {'n':'交易提示',         'h':'vInvestConsult/kind/jyts/index.phtml'},
+                    {'n':'融资融券',         'h':'vInvestConsult/kind/rzrq/index.phtml'},
+                    {'n':'大宗交易',         'h':'vInvestConsult/kind/dzjy/index.phtml'},
+                    {'n':'内部交易',         'h':'vInvestConsult/kind/nbjy/index.phtml'},
+                    {'n':'限售解禁',         'h':'vInvestConsult/kind/xsjj/index.phtml'},
+                    {'n':'千股千评',         'h':'vInvestConsult/kind/qgqp/index.phtml'},
+					{'n':'打新收益',         'h':'vInvestConsult/kind/dxsy/index.phtml'},
+					{'n':'历史分红',         'h':'vInvestConsult/kind/lsfh/index.phtml'}
+                    ]
+                },
+                {
+                't':'机构荐股池','u':'http://vip.stock.finance.sina.com.cn/q/go.php/',
+                'c':[
+                    {'n':'最新投资评级',            'h':'vIR_RatingNewest/index.phtml'},
+                    {'n':'上调评级股票',            'h':'vIR_RatingUp/index.phtml'},
+                    {'n':'下调评级股票',            'h':'vIR_RatingDown/index.phtml'},
+                    {'n':'股票综合评级',            'h':'vIR_SumRating/index.phtml'},
+                    {'n':'首次评级股票',            'h':'vIR_RatingFirst/index.phtml'},
+                    {'n':'目标涨幅排名',            'h':'vIR_SumPrice/index.phtml'},
+                    {'n':'机构关注度',              'h':'vIR_OrgCare/index.phtml'},
+                    {'n':'行业关注度',              'h':'vIR_IndustryCare/index.phtml'},
+                    {'n':'主流股价预测',           'h':'vIR_TargetPrice/index.phtml'},
+                    {'n':'投资评级选股',            'h':'vIR_CustomSearch/index.phtml','s':true}
+                    ]
+                },
+                {
+                    't':'龙虎榜','u':'http://vip.stock.finance.sina.com.cn/q/go.php/',n: true,
+                    'c':[
+                        {'n':'每日详情',            'h':'vInvestConsult/kind/lhb/index.phtml'},
+                        {'n':'个股上榜统计',            'h':'vLHBData/kind/ggtj/index.phtml'},
+                        {'n':'营业部上榜统计',            'h':'vLHBData/kind/yytj/index.phtml'},
+                        {'n':'机构席位追踪',            'h':'vLHBData/kind/jgzz/index.phtml'},
+                        {'n':'机构席位成交明细',            'h':'vLHBData/kind/jgmx/index.phtml'}                  
+                        ]
+                    },
+                {
+                't': '多盈数据','u': 'http://vip.stock.finance.sina.com.cn/q/go.php/',n: true,
+                'c':[
+                    {'n':'大盘趋势',                'h':'vDYData/kind/dpqs/index.phtml'},
+                    {'n':'短线出击',                'h':'vDYData/kind/dxcj/index.phtml'},
+                    {'n':'主力扫盘',                'h':'vDYData/kind/zlsp/index.phtml'},
+                    {'n':'B点买入',                'h':'vDYData/kind/bdmr/index.phtml'},
+                    {'n':'K多方炮',                'h':'vDYData/kind/kdfp/index.phtml'},
+                    {'n':'控盘金叉',                'h':'vDYData/kind/kpjc/index.phtml'},
+                    {'n':'智能诊断',                'h':'vDYData/kind/znzd/index.phtml'}
+                    ]
+                },
+                {
+                't':'牛股扫描','u':'http://vip.stock.finance.sina.com.cn/q/go.php/',
+                'c':[
+                    {'n':'主力尾盘拉升股',          'h':'vIR_EndRise/index.phtml'},
+                    {'n':'主力尾盘打压股',          'h':'vIR_EndFall/index.phtml'},
+                    {'n':'神秘资金吸筹',            'h':'vIR_IntervalRelease/index.phtml'},
+                    {'n':'即将爆发牛股',            'h':'vIR_Burstout/index.phtml'}
+                    ]
+                },
+                {
+                't':'市场表现','u':'http://vip.stock.finance.sina.com.cn/datacenter/hqstat.html#',
+                'c':[
+                    {'n':'阶段最高最低',            'h':'jdgd','d':'说明：沪深A股最近5、10、20、60日的阶段内最高价、最低价及涨跌幅。带括号数据表示统计区间有除权除息。'},
+                    {'n':'短期涨跌统计',            'h':'dqzd','d':'说明：沪深A股最近2、3、4、5日的阶段涨跌幅、换手率、振幅，其中涨跌幅以复权价进行计算'},
+                    {'n':'长期涨跌统计',            'h':'cqzd','d':'说明：沪深A股最近10、20、30、60日的阶段涨跌幅、换手率、振幅，其中涨跌幅以复权价进行计算'},
+                    {'n':'盘中创新高个股',          'h':'30xg','d':'说明：沪深A股今日创最近30个交易日内价格新高的股票。带括号数据表示统计区间有除权除息。'},
+                    {'n':'盘中创新低个股',          'h':'30xd','d':'说明：沪深A股今日创最近30个交易日内价格新高的股票。带括号数据表示统计区间有除权除息。'},
+                    {'n':'成交骤增个股',            'h':'cjzz','d':'说明：沪深A股中今日成交量较上一交易日成交量大幅增加的股票。带括号数据表示统计区间有除权除息。'},
+                    {'n':'成交骤减个股',            'h':'cjzj','d':'说明：沪深A股中今日成交量较上一交易日成交量大幅增加的股票。带括号数据表示统计区间有除权除息。'},
+                    {'n':'连续放量个股',            'h':'lxfl','d':'说明：沪深A股中成交量连续放大的股票。带括号数据表示统计区间有除权除息。'},
+                    {'n':'连续缩量个股',            'h':'lxsl','d':'说明：沪深A股中成交量连续缩小的股票。带括号数据表示统计区间有除权除息。'},
+                    {'n':'连续上涨个股',            'h':'lxsz','d':'说明：沪深A股中连续上涨的股票。带括号数据表示统计区间有除权除息。'},
+                    {'n':'连续下跌个股',            'h':'lxxd','d':'说明：沪深A股中连续下跌的股票。带括号数据表示统计区间有除权除息。'},
+                    {'n':'周涨跌排名',              'h':'zzd','d':'说明：沪深A股本周涨跌幅排名，涨跌幅以复权价进行计算。'},
+                    {'n':'一周强势股',              'h':'yzqs','d':'说明：沪深A股本周涨跌幅大于沪深300指数的股票，涨跌幅以复权价进行计算。'},
+                    {'n':'月涨跌排名',              'h':'yzd','d':'说明：沪深A股本月涨跌幅排名，涨跌幅以复权价进行计算。'},
+                    {'n':'一月强势股',              'h':'yyqs','d':'说明：沪深A股本月涨跌幅大于沪深300指数的股票，涨跌幅以复权价进行计算。'},
+                    {'n':'流通市值排行',            'h':'ltsz','d':'说明：沪深A股流通市值排名。'},
+                    {'n':'市盈率排行',              'h':'sylv','d':'说明：沪深A股静态市盈率、动态市盈率排名，静态市盈率以最近一个年度收益进行计算，动态市盈率以最近四个季度的单季收益进行计算。'},
+                    {'n':'市净率排行',              'h':'sjlv','d':'说明：沪深A股市净率排名。'}
+                    ]
+                },
+                {
+                't': '财务分析','u': 'http://vip.stock.finance.sina.com.cn/q/go.php/',
+                'c':[
+                    {'n':'盈利能力',                'h':'vFinanceAnalyze/kind/profit/index.phtml'},
+                    {'n':'营运能力',                'h':'vFinanceAnalyze/kind/operation/index.phtml'},
+                    {'n':'成长能力',                'h':'vFinanceAnalyze/kind/grow/index.phtml'},
+                    {'n':'偿债能力',                'h':'vFinanceAnalyze/kind/debtpaying/index.phtml'},
+                    {'n':'现金流量',                'h':'vFinanceAnalyze/kind/cashflow/index.phtml'},
+					{'n':'业绩报表',                'h':'vFinanceAnalyze/kind/mainindex/index.phtml'},
+                    {'n':'业绩预告',                'h':'vFinanceAnalyze/kind/performance/index.phtml'},
+                    {'n':'业绩快报',                'h':'vFinanceAnalyze/kind/news/index.phtml'},
+					{'n':'利润细分',                'h':'vFinanceAnalyze/kind/incomedetail/index.phtml'}
+                    ]
+                },
+                {
+                't': '业绩预测','u': 'http://vip.stock.finance.sina.com.cn/q/go.php/',
+                'c':[
+                    {'n':'每股收益预测',            'h':'vPerformancePrediction/kind/eps/index.phtml'},
+                    {'n':'营业收入预测',            'h':'vPerformancePrediction/kind/sales/index.phtml'},
+                    {'n':'净利润预测',              'h':'vPerformancePrediction/kind/np/index.phtml'},
+                    {'n':'净资产收益率预测',        'h':'vPerformancePrediction/kind/roe/index.phtml'}
+                    ]
+                },
+                {
+                't': '机构持股','u': 'http://vip.stock.finance.sina.com.cn/q/go.php/',
+                'c':[
+                    {'n':'机构持股汇总',            'h':'vComStockHold/kind/jgcg/index.phtml'},
+                    {'n':'基金重仓股',              'h':'vComStockHold/kind/jjzc/index.phtml'},
+                    {'n':'社保重仓股',              'h':'vComStockHold/kind/sbzc/index.phtml'},
+                    {'n':'QFII重仓股',              'h':'vComStockHold/kind/qfii/index.phtml'}
+                    ]
+                },
+                {
+                't': '分析师排名','u': 'http://vip.stock.finance.sina.com.cn/q/go.php/',
+                'c':[
+                    {'n':'最佳选股分析师',            'h':'vAnalystRank/kind/zjxg/index.phtml'},
+                    {'n':'盈利预测最准分析师',        'h':'vAnalystRank/kind/zzyc/index.phtml'},
+					{'n':'券商研究力量排行',          'h':'vAnalystRank/kind/qsph/index.phtml'}
+                    ]
+                }
+            ];

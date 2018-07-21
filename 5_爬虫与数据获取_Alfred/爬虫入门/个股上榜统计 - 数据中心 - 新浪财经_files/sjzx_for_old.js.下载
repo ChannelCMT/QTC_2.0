@@ -1,0 +1,142 @@
+if(!Function.prototype.ddpBind)
+{
+    Function.prototype.ddpBind = function(argObj,args)
+    {
+        var _fn = this;
+        return function()
+        {
+            _fn.apply(argObj || this,args || arguments);
+        }
+    };
+}
+if(!Function.prototype.bindArg)
+{
+    Function.prototype.bindArg = function()
+    {
+        return this.ddpBind(null,arguments);
+    };
+}
+!function($)
+{
+    var hashList = '';
+    function createMenu()
+    {
+        _hashList = [];
+        var _leftMenu = $('#leftMenu').empty();
+        var _dt,_span,_dd,_ul,_li,_a,_new;
+        for(var i = 0;i < menuList.length;i++)
+        {
+            _dt = $('<dt>');
+            _span = $('<a>').html(menuList[i].t);
+            _span[0].href = (menuList[i].u || '') + menuList[i].c[0].h;
+            _dt.append(_span).appendTo(_leftMenu);
+            if(menuList[i].n)
+            {
+                _new = $('<img>').appendTo(_dt);
+                _new.addClass('new');
+                _new[0].src = 'http://vip.stock.finance.sina.com.cn/q/view/image/new.gif';
+            }
+            _dd = $('<dd>');
+            _ul = $('<ul>');
+            _dd.append(_ul).appendTo(_leftMenu);
+            for(var j = 0;j < menuList[i].c.length;j++)
+            {
+                _li = $('<li>');
+                _a = $('<a>').html(menuList[i].c[j].n).attr('href',(menuList[i].u || '') + menuList[i].c[j].h);
+                if(menuList[i].c[j].s)
+                {
+                    _a.css('color','red');
+                }
+                _hashList.push(menuList[i].c[j].h);
+                _li.append(_a).appendTo(_ul);
+                if(j == menuList[i].c.length - 1)
+                {
+                    _li.css('border','none');
+                }
+            }
+        }
+        hashList = _hashList.join(',');
+    }
+    
+    function Menu(argHandlers,argContents,argNowMenu,argCssOff,argCssOn,argShowIndex,argShowIndex2,argShowFn,argHideFn)
+    {
+        if(argHandlers.length != argContents.length)
+        {
+            return false;
+        }
+        this.showIndex = argShowIndex || 0;
+        this.showIndex2 = argShowIndex2 || 0;
+        this.handlers = $(argHandlers);
+        this.contents = $(argContents);
+        this.cssOff = argCssOff;
+        this.cssOn = argCssOn;
+        this.showFn = argShowFn || function(){};
+        this.hideFn = argHideFn || function(){};
+        this.nowMenu = argNowMenu;
+        this.lastIndex = argShowIndex || 0;
+                
+        for(var i = 0;i < this.handlers.length;i++)
+        {
+            $(this.handlers[i]).click(this.click.ddpBind(this,[i,false]));
+            this.handlers[i].className = this.cssOff;
+            this.contents[i].style.display = 'none';
+        }
+        this.handlers[this.showIndex].className = this.cssOn;
+        this.contents[this.showIndex].style.display = '';
+        this.contents[this.showIndex].getElementsByTagName('li')[this.showIndex2].style.backgroundImage = 'url(/q/view/image/backon.gif)';
+        this.nowMenu.html(menuList[this.showIndex].c[this.showIndex2].n);
+    }
+    Menu.prototype.click = function(argIndex,argIndex2)
+    {
+        if(this.showIndex == argIndex && this.showIndex2 == argIndex2 && this.lastIndex == argIndex)
+        {
+            return;
+        }
+        this.handlers[this.showIndex].className = this.cssOff;
+        this.handlers[argIndex].className = this.cssOn;
+        this.contents[this.showIndex].style.display = 'none';
+        this.contents[argIndex].style.display = '';
+        if(argIndex2 !== false)
+        {
+            this.contents[this.lastIndex].getElementsByTagName('li')[this.showIndex2].style.backgroundImage = '';
+            this.contents[argIndex].getElementsByTagName('li')[argIndex2].style.backgroundImage = 'url(/q/view/image/backon.gif)';
+            this.nowMenu.html(menuList[argIndex].c[argIndex2].n);
+            this.showIndex2 = argIndex2;
+            this.lastIndex = argIndex;
+        }
+        this.showFn.call(this,argIndex);
+        this.hideFn.call(this,this.showIndex);
+        this.showIndex = argIndex;
+    };
+    
+    var lastHash;
+    function hashListener(argMenu)
+    {
+        var _hash,_showIndex = 0,_showIndex2 = 0,_callHash,_URL;
+        _URL = location.href.replace(location.search,'').replace(location.hash,'');
+        for(var i = 0;i < menuList.length;i++)
+        {
+            for(var j = 0;j < menuList[i].c.length;j++)
+            {
+                if((menuList[i].u || '') + menuList[i].c[j].h == _URL)
+                {
+                    _showIndex = i;
+                    _showIndex2 = j;
+                    break;
+                }
+            }
+        }
+        argMenu.click(_showIndex,_showIndex2);
+    }
+    
+    
+    $(function()
+    {
+        //createMenu();
+        var _leftMenu = $('#leftMenu');
+        var _menu = new Menu(_leftMenu.find('dt'),_leftMenu.find('dd'),$('#nowMenu'),'dt_off','dt_on',0,0);
+        
+        hashListener(_menu);
+        
+    });
+}(miniQuery);

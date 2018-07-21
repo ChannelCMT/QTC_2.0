@@ -1,0 +1,114 @@
+body {background-color:#fff; margin:0px; padding:0px;}
+
+/* 标准二级导航_财经 */
+.secondaryHeader{height:33px;overflow:hidden;background:url(http://i2.sinaimg.cn/dy/images/header/2008/standardl2nav_bg.gif) repeat-x #fff;color:#000;font-size:12px;font-weight:100;}
+.secondaryHeader img{border:none;}
+.secondaryHeader a,.secondaryHeader a:visited{color:#000;text-decoration:none;}
+.secondaryHeader a:hover,.secondaryHeader a:active{color:#c00;text-decoration:underline;}
+.sHBorder{border:1px #e3e3e3 solid;padding:0 10px 0 12px;overflow:hidden;zoom:1;}
+.sHLogo{float:left;height:31px;line-height:31px;overflow:hidden;}
+.sHLogo span,.sHLogo span a,.sHLogo span a:link,.sHLogo span a:visited,.sHLogo span a:hover{display:block;*float:left;display:table-cell;vertical-align:middle;*display:block;*font-size:27px;*font-family:Arial;height:31px;}
+.sHLogo span,.sHLogo span a img,.sHLogo span a:link img,.sHLogo span a:visited img,.sHLogo span a:hover img{vertical-align:middle;}
+.sHLinks{float:right;line-height:31px;}
+
+/* 标准二级导航_财经 */
+/* 新浪财经首页导航 */
+.sina_finance_nav {border-collapse:collapse; height:29px; margin:0px auto; width:950px; margin-top:5px;}
+.sina_finance_nav a {background:url(http://i3.sinaimg.cn/cj/financewidget/image/finance_bar.gif) repeat-x 0px -58px; color:#fff; display:block; font-size:12px; height:29px; line-height:29px; text-decoration:none;}
+.sina_finance_nav a:hover {text-decoration:underline;}
+.sina_finance_nav td.index {background:url(http://i3.sinaimg.cn/cj/financewidget/image/finance_bar.gif) no-repeat right -29px; font-weight:normal; height:29px; padding:0px; text-align:center;}
+.sina_finance_nav td.index a {background-position:0px 0px; display:block; height:29px; line-height:29px; margin-right:2px; overflow:hidden; padding:0px 5px;}
+.sina_finance_nav td {font-weight:normal; height:29px; padding:0px; text-align:center;}
+.sina_finance_nav th {background:url(http://i3.sinaimg.cn/cj/financewidget/image/finance_bar.gif) no-repeat 0px -87px; font-size:2px; padding:0px; width:2px;}
+	
+/* 新浪财经首页导航 */
+.logo_bar {font-size:12px; height:30px; line-height:30px; margin:15px auto; width:950px;}
+.logo {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/logo_main.gif) no-repeat; float:left; height:30px; width:176px;}
+.logo .logo_main {display:block; height:30px; padding-right:5px; width:176px;}
+.suggest {float:right; height:30px; line-height:30px;}
+
+/* main body */
+.main { border:1px solid #D8D8D8; font-size:12px; margin:0px auto;}
+.main .clear {clear:both; font-size:0px; height:0px; line-height:0px; width:0px;}
+.main .menu {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/menu_bg_title_2.gif) no-repeat; float:left; width:155px;}
+.main .menu .menu_items {margin:34px 0px 0px 4px;}
+.main .menu .menu_items .menu_line {border-top:1px solid #bdd2ed; font-size:0px; height:0px; line-height:0px;}
+.main .menu .menu_items .menu_item {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/menu_bg_d.gif) no-repeat -1px -1px; border:1px solid #bdd2ed; border-top:none; border-right:0px; color:#286bc5; display:block; height:28px; line-height:28px; padding-left:18px; text-decoration:none; width:132px;}
+.main .menu .menu_items .red {color:#ff0000; }
+.main .menu .menu_items .active {background-image:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/menu_bg_a.gif); border-right-color:#fff; cursor:default;}
+.main .list {}
+.main .list .title_bar {border-bottom:1px solid #D8D8D8; height:34px; line-height:34px; margin:0px 1px;}
+.main .list .title_bar .left {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/title_bar_left_bg.gif) no-repeat 9px 9px; float:left; font-size:14px; height:34px; padding-left:29px;}
+.main .list .title_bar .right {float:right; height:34px;}
+.main .list .title_bar .right .items {float:left;}
+.main .list .title_bar .right .with_bg {background-image:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/main_search_bg.gif); background-position:0px -28px; float:left; height:28px; line-height:28px; margin-top:3px;}
+.main .list .title_bar .right .left_sider {background-position:0px 0px; width:2px;}
+.main .list .title_bar .right .right_sider {background-position:0px -56px; margin-right:4px; width:2px;}
+.main .list .title_bar .right .text {color:#666; padding:0px 5px 0px 7px;}
+.main .list .title_bar .right .text_input {border:1px solid #7f9db9; font-size:12px; height:15px; margin-top:4px; padding:3px 0px 0px 5px;}
+.main .list .title_bar .right .input_text {color:#666; font-size:12px; margin-top:4px;}
+.main .list .title_bar .right .input_button {color:#333; font-size:12px; margin:3px 6px;}
+.main .list .filters {background-color:#f7fafd; margin:5px;}
+.main .list .filters .nw {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/angle_nw.gif) no-repeat left top;}
+.main .list .filters .ne {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/angle_ne.gif) no-repeat right top;}
+.main .list .filters .sw {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/angle_sw.gif) no-repeat left bottom;}
+.main .list .filters .se {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/angle_se.gif) no-repeat right bottom;}
+.main .list .filters .n {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/border_n.gif) repeat-x center top;}
+.main .list .filters .s {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/border_s.gif) repeat-x center bottom;}
+.main .list .filters .w {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/border_w.gif) repeat-y left center;}
+.main .list .filters .e {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/border_e.gif) repeat-y right center;}
+.main .list .filters .cc {padding:2px;zoom:1;}
+.main .list .filters .cc .title {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/dash_h.gif) repeat-x center center; color:#286bc5; height:21px; line-height:21px; margin:0px 4px;}
+.main .list .filters .cc .title .arrow {font-size:14px; padding:0px 10px;}
+.main .list .filters .cc .title .fold {background:#f7fafd url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/arrow_fold.gif) no-repeat center center;}
+.main .list .filters .cc .title .unfold {background:#f7fafd url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/arrow_unfold.gif) no-repeat center center;}
+.main .list .filters .cc .title .text {background-color:#f7fafd; font-size:14px; padding-right:5px;}
+.main .list .filters .cc .line {height:32px; line-height:32px;}
+.main .list .filters .cc .line .name {height:32px; float:left; padding-left:24px; width:80px;}
+.main .list .filters .cc .line .items {float:left; line-height:0px; padding-top:7px;}
+.main .list .filters .cc .line .items select {font-size:12px; margin-right:18px; width:140px;}
+.main .list .filters .cc .line .buttons {float:left; line-height:0px; padding-top:5px;}
+.main .list .filters .cc .line .buttons input {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/search_item.gif) no-repeat; border:none; color:#286bc5; cursor:pointer; font-size:12px; height:24px; line-height:24px; margin:0px; margin-right:36px; padding:0px; width:70px;}
+.main .list .filters .cc .line .buttons .search_all {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/search_all.gif) no-repeat; color:#fff;}
+.main .list .filters .cc .result {height:40px;}
+.main .list .filters .cc .result .number {color:#666; float:left; line-height:32px; padding-left:24px;}
+.main .list .filters .cc .result .number span {color:red; font-size:16px; font-family:"Arial"; padding:0px 5px;}
+.main .list .filters .cc .result .reset_button {float:right; padding-right:76px;}
+.main .list .filters .cc .result .reset_button input {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/search_reset.gif) no-repeat; border:none; color:#666; cursor:pointer; font-size:12px; height:23px; margin-top:6px; padding-left:40px; text-align:left; width:104px;}
+		/* here */
+.main .list .page_config {height:28px; line-height:28px; margin:0px 1px;}
+.main .list .page_config .left {color:#bbb; float:left; padding-left:10px;}
+.main .list .page_config .left a {color:#286bc5; display:block; float:left; text-align:center; text-decoration:none; width:85px;}
+.main .list .page_config .left a.active {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/time_tab_bg.gif) no-repeat center center; color:#fff;}
+.main .list .page_config .left .spliter {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/time_tab_spliter_bg.gif) no-repeat center center; display:block; float:left; height:28px; width:11px;}
+.main .list .page_config .right {float:right; padding-right:10px;}
+.main .list .page_config .right {color:#666; float:right; padding-right:10px;}
+.main .list .page_config .right .page_number {background:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/page_number_d.gif) no-repeat; color:#286bc5; padding:3px 3px; text-decoration:none;}
+.main .list .page_config .right .active {background-image:url(http://www.sinaimg.cn/cj/2010/0118/DataCenter/page_number_a.gif); color:#fff; cursor:default;}
+.main .list .list_table {border-collapse:collapse;width:100%;}
+.main .list .list_table td {height:28px; line-height:28px; margin:0px; text-align:center;/*border-bottom:1px dotted #afafaf;*/}
+.main .list .list_table tbody td{background: url(http://i0.sinaimg.cn/cj/stocklive2010/images/finance_stock_zxh_10.png) repeat-x 0% 100%;}
+.main .list .list_table .head td {background-color:#E7EBF3;background-image:none;}
+		/*add some style for trade mention*/
+.main .list .list_div{width:100%;border:0; cellspacing:0; cellpadding:0;border-collapse:collapse;}
+.main .list .list_div td{background-color:#E7EBF3;text-align:left;}
+.main .list .list_div tbody td{background-color:#E7EBF3;text-align:left;}
+.main .list .list_div .head td{background-image:none;text-align:left;background-color:#ffffff;cellspacing:0; cellpadding:0;border:0;}
+		/*end of addition*/
+.main .list .list_table a:link{color:#286BC5; text-decoration:underline;}
+.main .list .list_table a:hover,.main .list .list_table a:active{color:red; text-decoration:underline;}
+.main .list .list_table .head a{color:#286BC5;text-decoration:none;}
+.main .list .list_table .head a:hover,.main .list .list_table .head a active{ text-decoration:underline;}
+/*.main .list .list_table .blue td {background-color:#f2f7fb;}*/
+.main .list .list_table .icon {height:21px; width:21px;}
+.main .list .list_table .icon img {border:none;}
+.main .list .pages {height:40px; line-height:40px; margin:0px 1px; text-align:right;}
+.main .list .pages .page {border:1px solid #9aafe4; color:#3568b9; padding:3px 7px; text-decoration:none;}
+.main .list .pages .nolink {border:1px solid #d4d9d3; color:#979797; cursor:default; padding:3px 7px; text-decoration:none;}
+.main .up {color:#f00;}
+.main .down {color:#008000;}
+.main .red .colorize {color:#f00;}
+.main .green .colorize {color:#008000;}
+.head td,.head th{border:1px solid #BAD1E0;border-left:none;}
+.main .list .list_table .head .sort_up {background:#E7EBF3 url(http://www.sinaimg.cn/cj/subject/2009/0618/down_arrow.gif) no-repeat 80% center ;}
+.main .list .list_table .head .sort_down {background:#E7EBF3 url(http://www.sinaimg.cn/cj/subject/2009/0618/up_arrow.gif) no-repeat 80% center ;}

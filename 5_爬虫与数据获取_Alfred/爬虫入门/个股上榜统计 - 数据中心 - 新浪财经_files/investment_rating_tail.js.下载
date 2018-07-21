@@ -1,0 +1,134 @@
+	(function () {
+		this._get = function (__stringId) {
+			return document.getElementById(__stringId);
+		};
+		this._set = function (__objectTarget, __stringProperty, __objectValue) {
+			if (__stringProperty.indexOf(".") != -1) {
+				var __arrayProperty = __stringProperty.split(".");
+				__stringProperty = __arrayProperty.pop();
+				for (var i in __arrayProperty) {
+					__objectTarget = __objectTarget[__arrayProperty[i]];
+				}
+			}
+			if (__objectTarget[__stringProperty] != __objectValue) {
+				__objectTarget[__stringProperty] = __objectValue;
+			}
+		};
+		this._random = function () {
+			return (new Date()).getTime() + Math.random().toString().replace("0.", "");
+		};
+		this._bind = function (__functionBind, __argumentsBind) {
+			var __this = this;
+			return function () {
+				var __arguments = null;
+				if (typeof __argumentsBind != "undefined") {
+					for (var i = 0; i < arguments.length; i++) {
+						__argumentsBind.push(arguments[i]);
+					}
+					__arguments = __argumentsBind;
+				}
+				else {
+					__arguments = arguments;
+				}
+				return __functionBind.apply(__this, __arguments);
+			};
+		};
+		this._load = function (__stringUrl, __functionCallback, __stringCharset) {
+			var __elementScript = document.createElement("script");
+			__elementScript.type = "text/javascript";
+			if (typeof __stringCharset != "undefined") {
+				__elementScript.charset = __stringCharset;
+			}
+			__elementScript._functionCallback = typeof __functionCallback != "undefined" ?  __functionCallback : new Function();
+			__elementScript[document.all ? "onreadystatechange" : "onload"] = function () {
+				if (document.all && this.readyState != "loaded" && this.readyState != "complete") {return;}
+				this._functionCallback(this);
+				this._functionCallback = null;
+				this[document.all ? "onreadystatechange" : "onload"] = null;
+				this.parentNode.removeChild(this);
+			};
+			__elementScript.src = __stringUrl;
+			document.getElementsByTagName("head")[0].appendChild(__elementScript);
+		};
+		this._set = function (__objectTarget, __stringProperty, __objectValue) {
+			if (__stringProperty.indexOf(".") != -1) {
+				var __arrayProperty = __stringProperty.split(".");
+				__stringProperty = __arrayProperty.pop();
+				for (var i in __arrayProperty) {
+					__objectTarget = __objectTarget[__arrayProperty[i]];
+				}
+			}
+			if (__objectTarget[__stringProperty] != __objectValue) {
+				__objectTarget[__stringProperty] = __objectValue;
+			}
+		};
+		this._update = function () {
+			this._load("http://hq.sinajs.cn/rn=" + this._random() + "&list=" + this._stringTimeCode + ",s_" + this._arrayCode.join(",s_"), this._bind(function () {
+				for (var i in this._arrayCode) {
+					var __stringKey = "hq_str_s_" + this._arrayCode[i];
+					var __elementPrice = this._get(this._stringPricePre + this._arrayElement[i]);
+					var __elementChange = this._get(this._stringChangePre + this._arrayElement[i]);
+					if (__elementPrice && __elementChange) {
+						if (__stringKey in window && typeof window[__stringKey] == "string" && window[__stringKey] != "") {
+							var __arrayHq = window[__stringKey].split(",");
+							if (1 in __arrayHq) {
+								this._set(__elementPrice, "innerHTML", __arrayHq[1]);
+							}
+							if (3 in __arrayHq) {
+								this._set(__elementChange, "innerHTML", __arrayHq[3] + "%");
+							}
+							if (2 in __arrayHq) {
+								if (__arrayHq[2] * 1 > 0) {
+									this._set(__elementPrice, "className", "up");
+									this._set(__elementChange, "className", "up");
+								}
+								else if (__arrayHq[2] * 1 < 0) {
+									this._set(__elementPrice, "className", "down");
+									this._set(__elementChange, "className", "down");
+								}
+								else if (__arrayHq[2] * 1 == 0) {
+									this._set(__elementPrice, "className", "");
+									this._set(__elementChange, "className", "");
+								}
+							}
+						}
+						else {
+							this._set(__elementPrice, "innerHTML", "--");
+							this._set(__elementChange, "innerHTML", "--");
+							this._set(__elementPrice, "className", "");
+							this._set(__elementChange, "className", "");
+						}
+					}
+				}
+				var __elementUpdateTime = this._get(this._stringUpdateTimeId);
+				if (__elementUpdateTime) {
+					var __stringUpdateTimeKey = "hq_str_" + this._stringTimeCode;
+					if (__stringUpdateTimeKey in window && typeof window[__stringUpdateTimeKey] == "string" && window[__stringUpdateTimeKey] != "") {
+						var __arrayUpdateTime = window[__stringUpdateTimeKey].split(",");
+						if (30 in __arrayUpdateTime && 31 in __arrayUpdateTime) {
+							this._set(__elementUpdateTime, "innerHTML", __arrayUpdateTime[30] + " " + __arrayUpdateTime[31]);
+						}
+					}
+					else {
+						this._set(__elementUpdateTime, "innerHTML", "--");
+					}
+				}
+			}));
+		};
+		this.initialize = function () {
+			this._stringKey = "code_list";
+			this._stringContainer = "element_list";
+			this._stringTimeCode = "sh000001"
+			this._stringUpdateTimeId = "update_time";
+			this._stringPricePre = "price_";
+			this._stringChangePre = "change_";
+			this._numberInterval = 5 * 1000;
+			if (this._stringKey in window && window[this._stringKey] != "" && this._stringContainer in window && window[this._stringContainer] != "") {
+				this._arrayElement = window[this._stringContainer].split(",");
+				this._arrayCode = window[this._stringKey].split(",");
+				this._update();
+				setInterval(this._bind(this._update), this._numberInterval);
+			}
+		};
+		this.initialize.apply(this, arguments);
+	})();

@@ -1,0 +1,297 @@
+/**
+ * @author sina
+ */
+var FollowMeTimer;
+(function( $ ){
+
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
+	function pageY( elem ){
+		return elem.offsetParent ? 
+				elem.offsetTop + pageY( elem.offsetParent ) :
+				elem.offsetTop;
+	}
+	function pageX( elem ){
+		return elem.offsetParent ? 
+				elem.offsetLeft + pageX( elem.offsetParent ) :
+				elem.offsetLeft;
+	}	
+	function setOpacity( dom, num ){
+		if ( dom.style.opacity !== undefined )
+			dom.style.opacity = num/100;
+		else
+			if ( /msie/i.test( navigator.userAgent )  )
+				dom.style.filter = (dom.style.filter || "").replace( /alpha\([^)]*\)/, "" ) +
+							 "alpha(opacity='" + num + "')";	
+	}
+	
+	var Follow = function( config ){
+		for ( var o in config )
+			this[ o ] = config[o];
+		
+		this._init( this );
+		return this;			
+	};	
+	
+	Follow.zIndex = 3452345;
+	
+	Follow.prototype = {
+		el		: null,
+		cloneEl		: null, //cloneï¿½ï¿½ï¿½Ô?¿½ï¿??
+		
+		ie6			: /msie 6/i.test( navigator.userAgent ),
+		absolute	: false,
+		hidden		: true,
+		
+		opacity		: 90, //Í¸ï¿½ï¿½ï¿½ï¿½
+		shadow		: false,
+		minY		: 100,
+		maxY		: 20000,
+		
+		place		: "top",
+		
+		_init		: function( THIS ){
+			if ( this.el )
+				this.el = $( this.el );
+			else
+				return;	
+			
+			if ( !this.el.attr("id") )
+				this.el.attr("id", (+new Date()) );
+			
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½position,ï¿½Ãµï¿½ï¿½ï¿½Êµï¿½ï¿½Î»ï¿½ï¿½
+			this.el.css("position","");
+			this.offsetY = pageY( this.el[0] );
+			this.offsetX = pageX( this.el[0] );
+			//ï¿½ï¿½ï¿½Ô¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿?? 
+			
+			THIS._clone( THIS );
+			
+			//ï¿½ï¿½ï¿½Ã´ï¿½CSSï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½IE6 FIXED BUG
+			if ( THIS.ie6 ){
+				var bodyTag = document.body;
+				
+				if ( bodyTag.currentStyle ) {
+					if (bodyTag.currentStyle.backgroundImage == 'none' ) {
+						bodyTag.style.backgroundImage = 'url(about:blank)';
+					}
+					if (bodyTag.currentStyle.backgroundAttachment == 'scroll' ) {
+						bodyTag.style.backgroundAttachment = 'fixed';
+					}
+				}
+				//ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿??
+			    var b = document.createElement("style");
+			    b.type = "text/css";
+			    document.getElementsByTagName("head")[0].appendChild(b);
+				var csstr = ".followme-top{top:expression(eval(document.documentElement.scrollTop));}" +
+							".followme-bottom{top:expression(eval(document.documentElement.scrollTop+document.documentElement.clientHeight-this.offsetHeight));}";
+							
+			    b.styleSheet.cssText = csstr;
+			}
+			
+			this.start();
+		},
+		
+		_clone		: function( THIS ){
+//			$( this.el.attr("id")+"_clone" ).remove();
+            
+		    this.cloneEl = $(this.el[0].cloneNode(true)).hide().css('visibility','hidden');
+			
+			//ï¿½ï¿½ï¿½ï¿½Â¡ï¿½Úµï¿½ï¿½ï¿½ï¿½Ô?¿½Ð½Úµï¿½Ö???
+			this.el.parent()[0].insertBefore( this.cloneEl[0], this.el[0] );			
+		},
+		
+		_hide		: function(){
+			if ( !this.hidden ){
+				this.cloneEl.hide();
+				this.cloneEl[0].parentNode.insertBefore(this.el[0],this.cloneEl[0]);
+				$('#followDiv').remove();
+				
+//				this.el.css("position","").css( "top" ,"");
+//				this.el.find('td').css('width','');
+//				this.el.find('th').css('width','');
+				clearInterval(FollowMeTimer);
+				if (this.ie6) {
+					//this.el.css( "top" ,"");
+					this.el.removeClass( "followme-" + this.place );
+				}			
+				if ( typeof this.opacity == "number" )
+					setOpacity( this.el[0], 100 );
+					
+				this.hidden = true;			
+			}
+		},
+		
+		/*
+		 * Ö§ï¿½ï¿½FIXEDï¿½ï¿½ï¿½ï¿½ï¿?? ï¿½ï¿½Ò»ï¿½ï¿½TOPï¿½ï¿½ï¿½ï¿½Îª0
+		 * IE6ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½CSSï¿½Ä£ï¿½display=block
+		 */
+		_show		: function(){
+			if ( this.hidden ){
+
+				this.cloneEl.show();
+				var _div = $('<div>').attr('id','followDiv').css('width','804px').appendTo($('#divContainer'));
+				var _table = $('<table>').appendTo(_div);
+				_table[0].appendChild(this.el[0]);
+				_div.css("position","fixed").css("zIndex", Follow.zIndex++ );
+				var obj = this;
+				function setWidth()
+				{
+				    var tds = obj.el.find('td');
+				    var _tds = obj.cloneEl.find('td');
+				    var ths = obj.el.find('th');
+				    var _ths = obj.cloneEl.find('th');
+				    
+				    for(var i = 0;i < tds.length;i++)
+				    {
+				        tds[i].style.width = $(_tds[i]).css('width') + 'px';
+				    }
+				    for(var i = 0;i < ths.length;i++)
+				    {
+				        ths[i].style.width = $(_ths[i]).css('width') + 'px';
+				    }
+				    tds = _tds = ths = _ths = null;
+			    }
+			    function getLeft(argO)
+			    {
+			        if(argO.offsetParent)
+			            return argO.offsetLeft + getLeft(argO.offsetParent);
+		            else
+		                return argO.offsetLeft || 0;
+			    }
+		        setWidth();
+		        FollowMeTimer = setInterval(setWidth,100);
+				if (this.ie6) {
+					//log.info("add Class");
+					_div.css("position","absolute").addClass( "followme-" + this.place );//.css("left", this.offsetX+"px" );
+				}else{
+					_div.css( this.place ,"0px");
+				}
+				_div.css('left',getLeft($('#divContainer')[0]) + 'px');
+				if ( typeof this.opacity == "number" )	
+					setOpacity( _div[0], this.opacity );
+				if ( $.browser.msie ){
+					_div.css("zoom","1");
+				}	
+				this.hidden = false;			
+			}
+		},	
+		
+		_setX		: function( x ){
+			if (!this.hidden) {
+				//console.debug("x = " + x );
+				this.el.css("left", (this.offsetX- x )+"px" );
+			}
+		},
+		
+		start		: function(){
+			if (!this.suspend) {
+				var _self = this, 
+					minY = _self.minY, 
+					maxY = _self.maxY,
+					offsetX = _self.offsetX,
+					oldY = -100, oldX = -100;
+				
+				//ÏÈ¼ÓÔØresizeÊÂ¼þ£¬ÔÚIEÏÂ´¦ÀíÒ³ÃæÔªËØÊ±ÓÐ¿ÉÄÜµ¼ÖÂ´¥·¢´ÎÊÂ¼þ
+/*
+				$( window ).resize( this.resizeFn = function(){
+					_self._resize();
+				} );
+*/
+								
+				var de = document.documentElement, win;
+				//chrome has documentElement but doesn't has the right value
+				if ( de && !$.browser.safari ) 
+					win = de;
+				else 
+					win = document.body;
+					
+				var loop = this.loop = function(){
+					if ( _self.suspend ) return;
+					
+					//ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
+					var sy = win.scrollTop, sx = win.scrollLeft, s = _self;
+					//var sy = window.scrollY, sx = window.scrollX, s = _self;
+					
+					if (oldY != sy) {
+						oldY = sy;
+						//if ( _self.place == "bottom" )
+						if (sy > minY && sy < maxY) {
+								//alert( "show : sy=" + sy + " minY=" + minY + " maxY=" + maxY );
+								s._show();
+						}
+						else {
+								s._hide();
+								//oldX = -100
+						}
+					}
+					
+					if ( oldX != sx){
+						oldX = sx;
+						s._setX( sx );
+					}
+				};
+				
+				//ï¿½ï¿½IEï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½Í¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯Ð§ï¿½ï¿½ï¿½ï¿½
+				
+				if ($.browser.msie) {
+					$(window).scroll(loop);
+					loop();
+				}
+				else {
+					//window.addEventListener("scroll", loop, true );
+					this.timer = setInterval(loop, 50);
+				}
+				
+			}else
+				this.suspend = false;
+			
+			return this;
+		},
+		
+		_resize	: function(){
+			this._hide();
+			this.offsetY = pageY( this.el[0] );
+			this.offsetX = pageX( this.el[0] );
+			this._show();			
+			this.loop();
+		},
+		
+		stop	: function(){
+			if ( this.timer )
+				clearInterval( this.timer );
+				
+			this.suspend = true;
+			this._hide( this );
+			clearInterval(FollowMeTimer);
+			$('#followDiv').remove();
+			this.cloneEl.remove();
+			$( window ).unbind("scroll", this.loop);
+			$( window ).unbind("resize", this.resizeFn);
+		}		
+	};
+	
+	$.fn.extend( {
+		followme	: function( config ){
+			config = config || {};
+			
+			config.el = this[0];
+			if ( this.follow )
+				this.follow.stop();
+				
+			this.follow = new Follow( config );			
+			
+			return this;
+		},
+		
+		pageY	: function( elem ){
+			return pageY( this[0] );			
+		},
+		
+		pageX	: function( elem ){
+			return pageX( this[0] );			
+		}		
+	} );
+	
+})( miniQuery );
+
+

@@ -1,0 +1,1490 @@
+
+/* 
+ * Author 佟野
+ * Copyright (c) 2010, SINA Corporation. All rights reserved. 
+ */ 
+
+(function( window, undefined ) {
+
+// Define a local copy of miniQuery
+var miniQuery = function( selector, context ) {
+		// The miniQuery object is actually just the init constructor 'enhanced'
+		return arguments.length === 0 ?
+			rootminiQuery :
+			new miniQuery.fn.init( selector, context );
+	},
+
+	// Map over the $ in case of overwrite
+	_$$ = window.$$,
+
+	// Use the correct document accordingly with window argument (sandbox)
+	document = window.document,
+
+	// A central reference to the root miniQuery(document)
+	rootminiQuery,
+
+	// A simple way to check for HTML strings or ID strings
+	// (both of which we optimize for)
+	quickExpr = /^[<].*?[>]$/,
+	// Used for trimming whitespace
+	rtrim = /^\s+|\s+$/g,
+
+	//强化rsingleTag功能，可筛选出简单标签中的html内容，直接生成
+	//<th>xxxxx</th>
+	rsingleTag = /^<(\w+)\s*\/?>([^<]*)?(?:<\/\1>)?$/,
+
+	// Keep a UserAgent string for use with miniQuery.browser
+	userAgent = navigator.userAgent.toLowerCase(),
+
+	// Save a reference to some core methods
+	toString = Object.prototype.toString,
+	push = Array.prototype.push,
+	slice = Array.prototype.slice,
+	indexOf = Array.prototype.indexOf;
+
+miniQuery.fn = miniQuery.prototype = {
+	init: function( selector, context ) {
+		var match, elem, ret, doc;
+
+		// Handle $(""), $(null), or $(undefined)
+		if ( !selector ) {
+			return this;
+		}
+
+		// Handle $(DOMElement)
+		if ( selector.nodeType ) {
+			this[0] = selector;
+			this.length++;
+			return this;
+		}
+
+		// Handle HTML strings
+		if ( typeof selector === "string" ) {
+			//没有上下文环境时
+			if ( !context ){
+				// Are we dealing with HTML string or an ID?
+				if ( quickExpr.test( selector ) ){
+					// If a single string is passed in and it's a single tag
+					// just do a createElement and skip the rest
+					ret = rsingleTag.exec( selector );
+
+					if ( ret && ret[1] ) {
+						selector = [ document.createElement( ret[1] ) ];
+						if ( ret[2] )
+							selector[0].innerHTML = ret[2]; 
+					} else {
+						ret = buildFragment( selector, [ doc ] );
+						selector = ret.childNodes;
+					}					
+				}else{
+					//主要工作交给easyDom
+					selector = miniQuery.find( document, selector );
+				}
+			// HANDLE: $(expr, $(...))
+			} else {
+				if ( context.miniQuery )
+					return context.find( selector );
+				else
+					return miniQuery( context ).find( selector );	
+			} 
+
+		// HANDLE: $(function)
+		// Shortcut for document ready
+		} else if ( miniQuery.isFunction( selector ) ) {
+			return miniQuery.ready( selector );
+		}
+
+		return this.setArray(miniQuery.isArray( selector ) ?
+			selector :
+			miniQuery.makeArray(selector));
+	},
+
+	// The current version of miniQuery being used
+	miniQuery: "0.4",
+
+	// The default length of a miniQuery object is 0
+	length: 0,
+
+	toArray: function(){
+		return slice.call( this, 0 );
+	},
+	// Force the current matched set of elements to become
+	// the specified array of elements (destroying the stack in the process)
+	// You should use pushStack() in order to do this, but maintain the stack
+	setArray: function( elems ) {
+		// Resetting the length to 0, then using the native Array push
+		// is a super-fast way to populate an object with array-like properties
+		this.length = 0;
+		push.apply( this, elems );
+
+		return this;
+	},
+
+	// Execute a callback for every element in the matched set.
+	// (You can seed the arguments with an array of args, but this is
+	// only used internally.)
+	each: function( callback, args ) {
+		return miniQuery.each( this, callback, args );
+	},
+
+	// For internal use only.
+	// Behaves like an Array's method, not like a miniQuery method.
+	push: push,
+	sort: [].sort,
+	splice: [].splice
+};
+
+// Give the init function the miniQuery prototype for later instantiation
+miniQuery.fn.init.prototype = miniQuery.fn;
+
+miniQuery.extend = miniQuery.fn.extend = function() {
+	// copy reference to target object
+	var target = arguments[0] || {}, i = 1, length = arguments.length, deep = false, options, name, src, copy;
+
+	// Handle a deep copy situation
+	if ( typeof target === "boolean" ) {
+		deep = target;
+		target = arguments[1] || {};
+		// skip the boolean and the target
+		i = 2;
+	}
+
+	// Handle case when target is a string or something (possible in deep copy)
+	if ( typeof target !== "object" && !miniQuery.isFunction(target) ) {
+		target = {};
+	}
+
+	// extend miniQuery itself if only one argument is passed
+	if ( length === i ) {
+		target = this;
+		--i;
+	}
+
+	for ( ; i < length; i++ ) {
+		// Only deal with non-null/undefined values
+		if ( (options = arguments[ i ]) != null ) {
+			// Extend the base object
+			for ( name in options ) {
+				src = target[ name ];
+				copy = options[ name ];
+
+				// Prevent never-ending loop
+				if ( target === copy ) {
+					continue;
+				}
+
+				// Recurse if we're merging object values
+				if ( deep && copy && typeof copy === "object" && !copy.nodeType ) {
+					var clone;
+
+					if ( src ) {
+						clone = src;
+					} else if ( miniQuery.isArray(copy) ) {
+						clone = [];
+					} else if ( miniQuery.isObject(copy) ) {
+						clone = {};
+					} else {
+						clone = copy;
+					}
+
+					// Never move original objects, clone them
+					target[ name ] = miniQuery.extend( deep, clone, copy );
+
+				// Don't bring in undefined values
+				} else if ( copy !== undefined ) {
+					target[ name ] = copy;
+				}
+			}
+		}
+	}
+
+	// Return the modified object
+	return target;
+};
+
+miniQuery.extend({
+
+	// See test/unit/core.js for details concerning isFunction.
+	// Since version 1.3, DOM methods and functions like alert
+	// aren't supported. They return false on IE (#2968).
+	isFunction: function( obj ) {
+		return toString.call(obj) === "[object Function]";
+	},
+
+	isArray: function( obj ) {
+		return toString.call(obj) === "[object Array]";
+	},
+
+	isObject: function( obj ) {
+		return this.constructor.call(obj) === Object;
+	},
+
+	nodeName: function( elem, name ) {
+		return elem.nodeName && elem.nodeName.toUpperCase() === name.toUpperCase();
+	},
+
+	// args is for internal usage only
+	each: function( object, callback, args ) {
+		var name, i = 0,
+			length = object.length,
+			isObj = length === undefined || miniQuery.isFunction(object);
+
+		if ( args ) {
+			if ( isObj ) {
+				for ( name in object ) {
+					if ( callback.apply( object[ name ], args ) === false ) {
+						break;
+					}
+				}
+			} else {
+				for ( ; i < length; ) {
+					if ( callback.apply( object[ i++ ], args ) === false ) {
+						break;
+					}
+				}
+			}
+
+		// A special, fast, case for the most common use of each
+		} else {
+			if ( isObj ) {
+				for ( name in object ) {
+					if ( callback.call( object[ name ], name, object[ name ] ) === false ) {
+						break;
+					}
+				}
+			} else {
+				for ( var value = object[0];
+					i < length && callback.call( value, i, value ) !== false; value = object[++i] ) {}
+			}
+		}
+
+		return object;
+	},
+
+	trim: function( text ) {
+		return (text || "").replace( rtrim, "" );
+	},
+
+	makeArray: function( array ) {
+		var ret = [], i;
+
+		if ( array != null ) {
+			i = array.length;
+
+			// The window, strings (and functions) also have 'length'
+			if ( i == null || typeof array === "string" || miniQuery.isFunction(array) || array.setInterval ) {
+				ret[0] = array;
+			} else {
+				while ( i ) {
+					ret[--i] = array[i];
+				}
+			}
+		}
+
+		return ret;
+	},
+
+	inArray: function( elem, array ) {
+		for ( var i = 0, length = array.length; i < length; i++ ) {
+			if ( array[ i ] === elem ) {
+				return i;
+			}
+		}
+
+		return -1;
+	},
+
+	unique	: function( results ){
+		for ( var i = 1; i < results.length; i++ ) {
+			if ( results[i] === results[i-1] ) {
+				results.splice(i--, 1);
+			}
+		}
+		return results;		
+	},
+
+	map: function( elems, callback ) {
+		var ret = [], value;
+
+		// Go through the array, translating each of the items to their
+		// new value (or values).
+		for ( var i = 0, length = elems.length; i < length; i++ ) {
+			value = callback( elems[ i ], i );
+
+			if ( value != null ) {
+				ret[ ret.length ] = value;
+			}
+		}
+
+		return ret.concat.apply( [], ret );
+	},
+
+	// Use of miniQuery.browser is deprecated.
+	// It's included for backwards compatibility and plugins,
+	// although they should work to migrate away.
+	browser: {
+		version: (/.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/.exec(userAgent) || [0,'0'])[1],
+		safari: /webkit/.test( userAgent ),
+		opera: /opera/.test( userAgent ),
+		msie: /msie/.test( userAgent ) && !/opera/.test( userAgent ),
+		mozilla: /mozilla/.test( userAgent ) && !/(compatible|webkit)/.test( userAgent )
+	}
+});
+
+if ( indexOf ) {
+	miniQuery.inArray = function( elem, array ) {
+		return indexOf.call( array, elem );
+	};
+}
+
+// All miniQuery objects should point back to these
+rootminiQuery = miniQuery(document);
+
+// Mutifunctional method to get and set values to a collection
+// The value/s can be optionally by executed if its a function
+function access( elems, key, value, exec, fn ) {
+	var l = elems.length;
+	
+	// Setting many attributes
+	if ( typeof key === "object" ) {
+			for (var k in key) {
+				access(elems, k, key[k], exec, fn);
+			}
+		return elems;
+	}
+	
+	// Setting one attribute
+	if (value !== undefined) {
+		// Optionally, function values get executed if exec is true
+		exec = exec && miniQuery.isFunction(value);
+		
+		for (var i = 0; i < l; i++) {
+			var elem = elems[i],
+				val = exec ? value.call(elem, i) : value;
+			fn(elem, key, val);
+		}
+		return elems;
+	}
+	
+	// Getting an attribute
+	return l ? fn(elems[0], key) : null;
+}
+
+function now() {
+	return (new Date).getTime();
+}
+/*
+ * A number of helper functions used for managing events.
+ * Many of the ideas behind this code originated from
+ * Dean Edwards' addEvent library.
+ */
+miniQuery.event = {
+	guid: 1,
+	// Bind an event to an element
+	// Original by Dean Edwards
+	add: function( elem, type, handler ) {
+		
+		type = type.toLowerCase();
+		// Make sure that the function being executed has a unique ID
+		if ( !handler.guid ) {
+			handler.guid = this.guid++;
+		}
+
+		if( !elem.events ) elem.events = {};
+		
+		var handlers = elem.events[ type ];
+		if ( !handlers ){
+			handlers = elem.events[ type ] = {};
+			if( elem["on" + type ] )
+				handlers[ 0 ] = elem["on" + type ];
+		}
+		
+		handlers[ handler.guid ] = handler;
+		
+		//handler.elem = elem;
+		elem["on" + type] = miniQuery.event.handleEvent;
+		
+		// Nullify elem to prevent memory leaks in IE
+		elem = null;
+	},
+	
+	handleEvent	: function( event ){
+		event = miniQuery.event.fix( event || window.event );
+		
+		var handlers = this.events[ event.type ];
+		for( var i in handlers){
+			if ( handlers[i] != miniQuery.event.handleEvent )
+				handlers[i].call( this, event); 
+		}
+		
+		return true;
+	},
+	
+	trigger		: function( elem, type ){
+		type = type.toLowerCase();
+		if( elem.events && elem.events[ type ] ){
+			miniQuery.event.handleEvent.call( elem, { type : type } );
+		}		
+	},
+
+	// Detach an event or set of events from an element
+	remove: function( elem, type, handler ) {
+		if( elem.events ){
+			if ( type ) {
+				type = type.toLowerCase();
+				if (elem.events[type]) {
+					if (handler)
+						delete elem.events[type][handler.guid];
+					else 
+						elem.events[type] = {};
+				}	
+			}else
+				elem.events = {};	
+		}
+	},
+
+	props: "altKey cancelable clientX clientY ctrlKey currentTarget relatedTarget offsetX offsetY originalTarget pageX pageY screenX screenY shiftKey target which type".split(" "),
+
+	fix: function( event ) {
+		// store a copy of the original event object
+		// and "clone" to set read-only properties
+		var originalEvent = event || {};
+		event = miniQuery.Event( originalEvent );
+
+		for ( var i = this.props.length, prop; i; ) {
+			prop = this.props[ --i ];
+			event[ prop ] = originalEvent[ prop ];
+		}
+
+		return event;
+	}
+};
+
+miniQuery.Event = function( src ){
+	this.originalEvent = src;
+	// Allow instantiation without the 'new' keyword
+	if ( !this.preventDefault ) {
+		return new miniQuery.Event( src );
+	}
+};
+
+function returnFalse() {
+	return false;
+}
+function returnTrue() {
+	return true;
+}
+
+// miniQuery.Event is based on DOM3 Events as specified by the ECMAScript Language Binding
+// http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html
+miniQuery.Event.prototype = {
+	preventDefault: function() {
+		this.isDefaultPrevented = returnTrue;
+
+		var e = this.originalEvent;
+		if ( !e ) {
+			return;
+		}
+		
+		// if preventDefault exists run it on the original event
+		if ( e.preventDefault ) {
+			e.preventDefault();
+		}
+		// otherwise set the returnValue property of the original event to false (IE)
+		e.returnValue = false;
+	},
+	stopPropagation: function() {
+		this.isPropagationStopped = returnTrue;
+
+		var e = this.originalEvent;
+		if ( !e ) {
+			return;
+		}
+		// if stopPropagation exists run it on the original event
+		if ( e.stopPropagation ) {
+			e.stopPropagation();
+		}
+		// otherwise set the cancelBubble property of the original event to true (IE)
+		e.cancelBubble = true;
+	},
+	
+	getKey	: function(){
+		var event = this.originalEvent;
+		// Add which for key events
+		if ( !event.which && ((event.charCode || event.charCode === 0) ? event.charCode : event.keyCode) ) {
+			event.which = event.charCode || event.keyCode;
+		}
+		return 	event.which;	
+	},
+	
+	getButton	: function(){
+		var event = this.originalEvent;
+		// Add which for click: 1 == left; 2 == middle; 3 == right
+		// Note: button is not normalized, so don't use it
+		if ( !event.which && event.button !== undefined ) {
+			event.which = (event.button & 1 ? 1 : ( event.button & 2 ? 3 : ( event.button & 4 ? 2 : 0 ) ));
+		}
+		return 	event.which;
+	}	
+};
+
+miniQuery.fn.extend({
+	// TODO: make bind(), unbind() and one() DRY!
+	bind: function( type, fn ) {
+		return this.each(function() {
+			miniQuery.event.add( this, type, fn );
+		});
+	},
+
+	unbind: function( type, fn ) {
+		return this.each(function() {
+			miniQuery.event.remove( this, type, fn );
+		});
+	},
+	
+	trigger: function( type ) {
+		return this.each(function() {
+			miniQuery.event.trigger( this, type );
+		});
+	},
+
+	hover: function( fnOver, fnOut ) {
+		return this.mouseenter( fnOver ).mouseleave( fnOut || fnOver );
+	}		
+});
+
+
+miniQuery.extend({
+	isReady: false,
+	readyList: [],
+	// Handle when the DOM is ready
+	ready: function( handler ) {
+		if( miniQuery.isFunction(handler) ){
+			if( miniQuery.isReady ){
+				handler.call( document, miniQuery );
+			}else
+				miniQuery.readyList.push( handler );
+		} else 
+		// Make sure that the DOM is not already loaded
+		if ( !miniQuery.isReady ) {
+			// Remember that the DOM is ready
+			miniQuery.isReady = true;
+
+			// If there are functions bound, to execute
+			if ( miniQuery.readyList ) {
+				// Execute all of them
+				var fn, i = 0;
+				while ( (fn = miniQuery.readyList[ i++ ]) ) {
+					fn.call( document, miniQuery );
+				}
+
+				// Reset the list of functions
+				miniQuery.readyList = null;
+			}
+		}
+	}
+});
+
+var readyBound = false;
+
+(function(){
+	if ( readyBound ) return;
+	readyBound = true;
+
+	// Catch cases where $(document).ready() is called after the
+	// browser event has already occurred.
+	if ( document.readyState === "complete" ) {
+		return miniQuery.ready();
+	}
+
+	// Mozilla, Opera and webkit nightlies currently support this event
+	if ( document.addEventListener ) {
+		// Use the handy event callback
+		document.addEventListener( "DOMContentLoaded", function() {
+			document.removeEventListener( "DOMContentLoaded", arguments.callee, false );
+			miniQuery.ready();
+		}, false );
+
+	// If IE event model is used
+	} else if ( document.attachEvent ) {
+		// ensure firing before onload,
+		// maybe late but safe also for iframes
+		document.attachEvent("onreadystatechange", function() {
+			if ( document.readyState === "complete" ) {
+				document.detachEvent( "onreadystatechange", arguments.callee );
+				miniQuery.ready();
+			}
+		});
+
+		// If IE and not an iframe
+		// continually check to see if the document is ready
+		// NOTE: DO NOT CHANGE TO ===, FAILS IN IE.
+		if ( document.documentElement.doScroll && window == window.top ) (function() {
+			if ( miniQuery.isReady ) {
+				return;
+			}
+
+			try {
+				// If IE is used, use the trick by Diego Perini
+				// http://javascript.nwbox.com/IEContentLoaded/
+				document.documentElement.doScroll("left");
+			} catch( error ) {
+				setTimeout( arguments.callee, 0 );
+				return;
+			}
+
+			// and execute any waiting functions
+			miniQuery.ready();
+		})();
+	}
+
+	// A fallback to window.onload, that will always work
+	miniQuery.event.add( window, "load", miniQuery.ready );
+})();
+
+miniQuery.each( ("blur,focus,load,resize,scroll,unload,click,dblclick," +
+	"mousedown,mouseup,mousemove,mouseover,mouseout,mouseenter,mouseleave," +
+	"change,select,submit,keydown,keypress,keyup,error").split(","), function( i, name ) {
+
+	// Handle event binding
+	miniQuery.fn[ name ] = function( fn ) {
+		return fn ? this.bind( name, fn ) : this.trigger( name );
+	};
+});
+
+// 非IE下 override mouseenter / mouseleave
+if ( !miniQuery.browser.msie ){
+		
+miniQuery.each( ["mouseenter","mouseleave"], function( i, name ) {
+
+	// Handle event binding
+	miniQuery.fn[ name ] = function( fn ) {
+		
+		var proxy = function( event ){
+			// Check if mouse(over|out) are still within the same parent element
+			var parent = event.relatedTarget;
+			// Traverse up the tree
+			while ( parent && parent != this ) {
+				// Firefox sometimes assigns relatedTarget a XUL element
+				// which we cannot access the parentNode property of
+				try { parent = parent.parentNode; }
+				// assuming we've left the element since we most likely mousedover a xul element
+				catch(e) { break; }
+			}
+		
+			if ( parent != this ) {
+				// set the correct event type
+				// handle event if we actually just moused on to a non sub-element
+				fn.apply( this, arguments );
+			}					
+		};
+		
+		var alias = name == "mouseenter" ? "mouseover" : "mouseout";
+					
+		return fn ? this.bind( alias, proxy ) : this.trigger( alias );
+	};
+});	
+	
+};
+/**
+* @author tongye
+*/
+
+//解析器 判断ID/CLASS/TAG
+//var re = /^[<](\w+)$|^[.](\w+)$|^(\w+)$/;
+//新解析器 还是以#ID， .class  tag 查询
+var re = /^[#](\w+)$|^[.](\w+)$|^(\w+)$/;
+
+var easyDom = function( context, selector, results ){
+	results = results || [];
+	context = context || document;
+	
+	//如果有多个上下文环境
+	if ( context.constructor == Array ){
+		for (var i=0; i<context.length; i++) {
+			arguments.callee( context[i], selector, results );
+		}
+		return results;					
+	}
+	
+	if ( context.nodeType !== 1 && context.nodeType !== 9 ) {
+		return [];
+	}
+	
+	if ( !selector || typeof selector !== "string" ) {
+		return results;
+	}
+	
+	//具体检索操作放到find中
+	var ret = easyDom.find( context, selector );
+	for (var i=0; i<ret.length; i++) {
+		results.push( ret[i] )
+	}			
+	
+	return results;
+}
+
+miniQuery.extend( easyDom, {
+	
+	parser	: function( selector ){
+		var match = re.exec( selector );
+		return match ? {
+			TAG		: match[3],
+			CLASS	: match[2],
+			ID		: match[1]
+		} : {};
+	},
+	
+	find	: function( context, selector ){
+		var p = easyDom.parser( selector );
+		for( var key in p ){
+			if ( key && p[key] ) {
+				return easyDom.find[key](context, p[key]);
+			}	
+		}
+		//没有找到时返回空
+		return [];
+	},
+	
+	filter	: function( elems, selector ){
+		if (selector ) {
+			var p = easyDom.parser(selector), fn, match, ret=[];
+			//获得过滤函数
+			for (var key in p) {
+				if (key && p[key]) {
+					fn = easyDom.filter[key];
+					match = p[key];
+					break;
+				}
+			}
+			if (fn && match) {
+				for (var i = 0; i < elems.length; i++) {
+					if ( elems[i] && fn(elems[i], match) === true ) 
+						ret.push( elems[i] );
+				}
+			}
+			return ret;
+		}
+		return elems;
+	}
+} );
+
+
+miniQuery.extend( easyDom.find, {
+	ID : function( context, match ){
+		//sometimes... context doesn't have getElementById function
+		var ret = context.getElementById ? 
+					context.getElementById( match ) :
+					document.getElementById( match );
+		return ret === null ? [] : [ ret ];
+	},
+	
+	TAG : function( context, match ){
+		return context.getElementsByTagName( match.toUpperCase() );
+	},
+	
+	CLASS : 	function( context, match ){
+		if ( context.getElementsByClassName ) {
+			return context.getElementsByClassName( match );
+		}else{
+			var results =  context.getElementsByTagName("*") || [],
+				length = results.length;
+			var all = new Array( length );
+			while( length-- ) all[ length ] = results[ length ];
+			
+			var i = all.length, ret=[],
+				pattern = new RegExp( "(^|\\s)" + match + "(\\s|$)" );
+				
+			while(--i >= 0){
+				if( pattern.test( all[i].className ) ){
+					ret.push( all[i] ); 
+				}
+			}
+			return ret;
+		}
+	}				
+} );
+
+
+miniQuery.extend( easyDom.filter, {
+	
+	ID : function(elem, match){
+		return elem.nodeType === 1 && elem.getAttribute("id") === match;
+	},
+	
+	TAG : function(elem, match){
+		return elem.nodeType === 1 && elem.nodeName === (match||"").toUpperCase();
+	},
+	
+	CLASS : 	function(elem, match){
+		return (" " + (elem.className || elem.getAttribute("class")) + " ")
+			.indexOf( match ) > -1;
+	}
+});
+
+//扩展miniQuery自身，减小耦合度
+miniQuery.extend( {
+	
+	find : easyDom,
+	filter : easyDom.filter,
+	sibling : function(n, elem){
+		var r = [];
+	
+		for ( ; n; n = n.nextSibling ) {
+			if ( n.nodeType == 1 && n != elem )
+				r.push( n );
+		}
+	
+		return r;
+	}	
+} );
+
+
+miniQuery.fn.extend({
+	find: function( selector ) {
+		return miniQuery( miniQuery.find( miniQuery.makeArray( this ), selector) );
+	},
+
+	filter: function( selector ) {
+		return miniQuery( miniQuery.filter( miniQuery.makeArray( this ), selector ) );
+	}
+});
+
+miniQuery.each({
+	parent: function(elem){return elem.parentNode;},
+	siblings: function(elem){return miniQuery.sibling(elem.parentNode.firstChild,elem);},
+	children: function(elem){return miniQuery.sibling(elem.firstChild);}
+}, function(name, fn){
+	miniQuery.fn[ name ] = function( selector ) {
+		var ret = miniQuery.map( this, fn );
+
+		ret = this.length > 1 ? miniQuery.unique( ret ) : ret;
+	
+		return miniQuery( miniQuery.makeArray( miniQuery.filter( ret, selector ) ) );
+	};
+});
+miniQuery.fn.extend({
+
+	html: function( value ) {
+		if ( value === undefined ) {
+			return this[0] ?
+				this[0].innerHTML :
+				null;
+		// See if we can take a shortcut and just use innerHTML
+		}
+		try {
+			for ( var i = 0, l = this.length; i < l; i++ ) {
+				// Remove element nodes and prevent memory leaks
+				if ( this[i].nodeType === 1 ) {
+					this[i].innerHTML = value;
+				}
+			}
+		// If using innerHTML throws an exception, use the fallback method
+		} catch(e) {
+			this.empty().append( value );
+		}
+
+		return this;
+	}
+});
+
+//简化 不缓存
+function buildFragment(html, nodes){
+
+	doc = (nodes && nodes[0] ? nodes[0].ownerDocument || nodes[0] : document);
+	fragment = doc.createDocumentFragment();
+	var wrap = fragment.appendChild(document.createElement('div'));
+	wrap.innerHTML = html;
+
+	return wrap;
+}
+
+miniQuery.each({
+	remove: function() {
+		if ( this.parentNode ) {
+			 this.parentNode.removeChild( this );
+		}
+	},
+	
+	empty: function() {
+		// Remove any remaining nodes
+		while ( this.firstChild ) {
+			this.removeChild( this.firstChild );
+		}
+	},
+	
+	append : function( elem ){
+		elem = miniQuery(elem)[0];
+		if ( this.nodeType === 1 ) {
+			this.appendChild( elem );
+		}		
+	},
+	
+	prepend: function( elem ) {
+		elem = miniQuery(elem)[0];
+		if ( this.nodeType === 1 ) {
+			this.insertBefore( elem, this.firstChild );
+		}
+	},	
+	
+	appendTo : function	( elem ){
+		miniQuery( miniQuery( elem )[0] ).append( this )
+	}
+	
+}, function(name, fn){
+	miniQuery.fn[ name ] = function(){
+		return this.each( fn, arguments );
+	};
+});
+
+// exclude the following css properties to add px
+var rexclude = /z-?index|font-?weight|opacity|zoom|line-?height/i,
+	rdashAlpha = /-([a-z])/ig,
+	rupper = /([A-Z])/g,
+	rnumpx = /^\d+(?:px)?$/i,
+	rnum = /^\d/,
+
+	// cache check for defaultView.getComputedStyle
+	getComputedStyle = document.defaultView && document.defaultView.getComputedStyle,
+	fcamelCase = function(all, letter){
+		return letter.toUpperCase();
+	};
+
+miniQuery.fn.css = function( name, value ) {
+	return access( this, name, value, true, function( elem, name, value ) {
+		if (value === undefined) {
+			return miniQuery.css( elem, name );
+		}
+		
+		if ( typeof value === "number" && !rexclude.test(name) ) {
+			value += "px";
+		}
+
+		miniQuery.style( elem, name, value );
+	});
+};
+
+miniQuery.extend({
+	style: function( elem, name, value ) {
+		// don't set styles on text and comment nodes
+		if ( !elem || elem.nodeType === 3 || elem.nodeType === 8 ) {
+			return undefined;
+		}
+
+		var style = elem.style || elem, set = value !== undefined;
+
+		name = name.replace(rdashAlpha, fcamelCase);
+
+		if ( set ) {
+			style[ name ] = value;
+		}
+
+		return style[ name ];
+	},
+
+	css: function( elem, name, force, extra ) {
+		if ( name === "width" || name === "height" ) {
+			var val, props = { position: "absolute", visibility: "hidden", display:"block" }, which = name === "width" ? [ "Left", "Right" ] : [ "Top", "Bottom" ];
+
+			function getWH() {
+				val = name === "width" ? elem.offsetWidth : elem.offsetHeight;
+
+				if ( extra === "border" ) { return; }
+
+				miniQuery.each( which, function() {
+					if ( !extra ) {
+						val -= parseFloat(miniQuery.curCSS( elem, "padding" + this, true)) || 0;
+					}
+
+					if ( extra === "margin" ) {
+						val += parseFloat(miniQuery.curCSS( elem, "margin" + this, true)) || 0;
+					} else {
+						val -= parseFloat(miniQuery.curCSS( elem, "border" + this + "Width", true)) || 0;
+					}
+				});
+			}
+
+			if ( elem.offsetWidth !== 0 ) {
+				getWH();
+			} else {
+				miniQuery.swap( elem, props, getWH );
+			}
+
+			return Math.max(0, Math.round(val));
+		}
+
+		return miniQuery.curCSS( elem, name, force );
+	},
+
+	curCSS: function( elem, name, force ) {
+		var ret, style = elem.style, filter;
+
+		if ( !force && style && style[ name ] ) {
+			ret = style[ name ];
+
+		} else if ( getComputedStyle ) {
+
+			name = name.replace( rupper, "-$1" ).toLowerCase();
+
+			var computedStyle = (getComputedStyle || elem.ownerDocument.defaultView.getComputedStyle)( elem, null );
+
+			if ( computedStyle ) {
+				ret = computedStyle.getPropertyValue( name );
+			}
+
+		} else if ( elem.currentStyle ) {
+			var camelCase = name.replace(rdashAlpha, fcamelCase);
+
+			ret = elem.currentStyle[ name ] || elem.currentStyle[ camelCase ];
+		}
+
+		return ret;
+	},
+
+	// A method for quickly swapping in/out CSS properties to get correct calculations
+	swap: function( elem, options, callback ) {
+		var old = {};
+
+		// Remember the old values, and insert the new ones
+		for ( var name in options ) {
+			old[ name ] = elem.style[ name ];
+			elem.style[ name ] = options[ name ];
+		}
+
+		callback.call( elem );
+
+		// Revert the old values
+		for ( var name in options ) {
+			elem.style[ name ] = old[ name ];
+		}
+	}
+});
+
+miniQuery.each({
+	//hide	: ["display", "none"],
+	//show	: ["display", "block"],
+	height	: ["height", undefined ],
+	width	: ["width", undefined ]
+}, function( name, arr ){
+	miniQuery.fn[ name ] = function(){
+		return this.css( arr[0], arr[1]===undefined ? arguments[0] : arr[1] );
+	}
+});
+
+miniQuery.fn.hide = function(){
+	return this.each(function() {
+		this.style.display = "none";
+	});
+};
+
+miniQuery.fn.show = function(){
+	return this.each(function() {
+		this.style.display = "";
+		//如果本来就为none，则强制设为block
+		if ( miniQuery.curCSS(this, "display") == "none" )
+			this.style.display = "block";
+	});
+};
+miniQuery.fn.extend({
+	attr: function( name, value ) {
+		return access(this, name, value, true, miniQuery.attr);
+	},
+
+	addClass: function( value ) {
+		if ( value && typeof value === "string" ) {
+			for ( var i = 0, l = this.length; i < l; i++ ) {
+				var elem = this[i];
+
+				if ( elem.nodeType === 1 ) {
+					var className = " " + elem.className + " ";
+					if ( className.indexOf( " " + value + " " ) < 0 ) {
+						elem.className += " " + value;
+					}
+				}
+			}
+		}
+		return this;
+	},
+
+	removeClass: function( value ) {
+		if ( value && typeof value === "string" ) {
+			for ( var i = 0, l = this.length; i < l; i++ ) {
+				var elem = this[i];
+
+				if ( elem.nodeType === 1 && elem.className ) {
+					var className = elem.className + " ";
+					elem.className = miniQuery.trim( className.replace(value + " ", "") );
+				}
+			}
+		}
+
+		return this;
+	},
+
+	val: function( value ) {
+		if ( value === undefined ) {
+			var elem = this[0];
+
+			if ( elem ) {
+				if( miniQuery.nodeName( elem, 'option' ) )
+					return (elem.attributes.value || {}).specified ? elem.value : elem.text;
+
+				// We need to handle select boxes special
+				if ( miniQuery.nodeName( elem, "select" ) ) {
+					var index = elem.selectedIndex,
+						values = [],
+						options = elem.options,
+						one = elem.type == "select-one";
+
+					// Nothing was selected
+					if ( index < 0 )
+						return null;
+
+					// Loop through all the selected options
+					for ( var i = one ? index : 0, max = one ? index + 1 : options.length; i < max; i++ ) {
+						var option = options[ i ];
+
+						if ( option.selected ) {
+							// Get the specifc value for the option
+							value = miniQuery(option).val();
+
+							// We don't need an array for one selects
+							if ( one )
+								return value;
+
+							// Multi-Selects return an array
+							values.push( value );
+						}
+					}
+
+					return values;
+				}
+
+				// Everything else, we just grab the value
+				return (elem.value || "").replace(/\r/g, "");
+
+			}
+
+			return undefined;
+		}
+
+		// Typecast once if the value is a number
+		if ( typeof value === "number" )
+			value += '';
+			
+		var val = value;
+
+		return this.each(function(){
+			
+			if ( this.nodeType != 1 )
+				return;
+
+			if ( miniQuery.isArray(val) && /radio|checkbox/.test( this.type ) )
+				this.checked = miniQuery.inArray(this.value || this.name, val) >= 0;
+
+			else if ( miniQuery.nodeName( this, "select" ) ) {
+				var values = miniQuery.makeArray(val);
+
+				miniQuery( "option", this ).each(function(){
+					this.selected = miniQuery.inArray( this.value || this.text, values ) >= 0;
+				});
+			} else
+				this.value = val;
+		});
+	}
+});
+
+miniQuery.extend({
+	attr: function( elem, name, value ) {
+		// don't set attributes on text and comment nodes
+		if (!elem || elem.nodeType == 3 || elem.nodeType == 8)
+			return undefined;
+
+		if ( name in miniQuery.fn && name !== "attr" ) {
+			return miniQuery(elem)[name](value);
+		}
+		
+		var set = value !== undefined;
+
+		// If applicable, access the attribute via the DOM 0 way
+		if ( name in elem ) {
+			if (set) {
+				elem[name] = value;
+				return this;
+			}
+			else 
+				return elem[name ];
+		}
+
+		if ( set )
+			// convert the value to a string (all browsers do this but IE) see #1070
+			elem.setAttribute( name, "" + value );
+
+		var attr = elem.getAttribute( name );
+
+		// Non-existent attributes return null, we normalize to undefined
+		return attr === null ? undefined : attr;
+	}
+});
+/**
+ * @author tongye
+ */
+
+function httpSuccess( xhr ) {
+	try {
+		// IE error sometimes returns 1223 when it should be 204 so treat it as success, see #1450
+		return !xhr.status && location.protocol === "file:" ||
+			// Opera returns 0 when status is 304
+			( xhr.status >= 200 && xhr.status < 300 ) ||
+			xhr.status === 304 || xhr.status === 1223 || xhr.status === 0;
+	} catch(e){}
+
+	return false;
+}
+
+function httpData ( xhr, type ) {
+	var ct = xhr.getResponseHeader("content-type"),
+		xml = type === "xml" || !type && ct && ct.indexOf("xml") >= 0,
+		data = xml ? xhr.responseXML : xhr.responseText;
+
+	// The filter can actually parse the response
+	if ( typeof data === "string" ) {
+
+		// Get the JavaScript object, if JSON is used.
+		if ( type === "json" ) {
+			data = (new Function("return " + data))();
+		}
+	}
+
+	return data;
+}
+
+function param(a){
+    var s = [];
+    function add(key, value){
+        s[s.length] = encodeURIComponent(key) + '=' + encodeURIComponent(value);
+    };
+    for (var j in a) {
+        if ( miniQuery.isArray(a[j]) ) 
+            for (var i = 0; i < a[j].length; i++) 
+                add(j, a[j][i]);
+        else 
+            add(j, a[j]);
+    }
+    return s.join("&").replace(/%20/g, "+");
+}
+
+var head = document.createElement("div"), inserthead = false;
+
+miniQuery.extend({
+	ajaxSettings	: {
+		method	: "GET",
+		url		: "",
+		type	: "text",
+		contentType: "application/x-www-form-urlencoded",
+		async: true,
+		timeout : 5000,	
+		random  : false,
+		charset: "gb2312",
+		xhr: function(){
+			return window.ActiveXObject ?
+				new ActiveXObject("Microsoft.XMLHTTP") :
+				new XMLHttpRequest();
+		},
+		
+		//当type为jsonp时调用该方法，单提出来供其他组织方法覆盖
+		jsonpUrl	: function( s, fnName ){
+			//return s.url + "/" + fnName + "/" + s.invoke + "?" + s.data + "&_=" + (+new Date());
+			//去掉随机数，利用页面级缓存，减小服务器压力
+			return s.url + "/" + fnName + "/" + s.invoke + "?" + s.data ;
+		},
+		invoke	: "", //调用JSONP时需要覆盖的参数
+		
+		onError		: function(){},
+		onSuccess	: function(){},
+		onComplete	: function(){}							
+	},
+	ajax	: function( config, callback ){
+		var s = miniQuery.extend( {}, miniQuery.ajaxSettings, config ),
+			type = s.type.toLowerCase(),
+			ts = now();
+		
+		//onSuccess = callback
+		if ( callback )
+			s.onSuccess = callback;
+		
+		// convert data if not already a string
+		if ( s.data && typeof s.data !== "string" ) {
+			s.data = param(s.data);
+		}
+		
+		//在URL末尾添加时间戳
+		//jsonp的url在jsonpUrl特殊处理
+		//if ( s.method == "GET" && s.type != "jsonp" ){
+		if ( s.random == true ){			
+			// try replacing _= if it is there
+			var ret = s.url.replace(/(\?|&)_=.*?(&|$)/, "$1_=" + ts + "$2");
+			// if nothing was replaced, add timestamp to the end
+			s.url = ret + ((ret === s.url) ? (/\?/.test(s.url) ? "&" : "?") + "_=" + ts : "");				
+		}
+
+		//使用XMLHttpRequest获取数据	
+		if ( /^(xml|text|json)$/.test( type ) ){
+			var xhr = new s.xhr(), requestDone = false;
+			
+			if ( s.data && s.method == "GET" ) {
+				s.url += (/\?/.test( s.url ) ? "&" : "?") + s.data;
+			}
+			//设置http头信息
+			if ( s.data ) {
+				try {
+					xhr.setRequestHeader("Cache-Control", "no-cache"); 
+					xhr.setRequestHeader("Content-Type", s.contentType);
+				} catch (e) {}
+			}			
+			
+			xhr.open( s.method, s.url, s.async );
+			
+			//超过5秒后取消请求
+			setTimeout( function(){
+				requestDone = true;
+				if ( xhr )
+					xhr.abort();
+			}, s.timeout );
+			
+			xhr.onreadystatechange = function(){
+				if ( xhr.readyState == 4 && !requestDone ){
+					if ( httpSuccess( xhr ) ){
+						s.onSuccess( httpData( xhr, type ) )
+					}else{
+						s.onError( xhr );
+					}
+					
+					s.onComplete( xhr );
+					
+					xhr = null;
+				}
+			}
+			
+			xhr.send( s.method == "POST" ? s.data : null );
+		} else {
+			//var head = document.getElementsByTagName("head")[0],
+			//var head = document.createElement("div"),
+			var	script = document.createElement("script");
+			
+			if (!inserthead) {
+				inserthead = true;
+				document.body.appendChild(head);
+			}
+			script.type = "text/javascript";
+			script.charset = s.charset;
+			
+			//生成新方法，调用后删除
+			if (type == "jsonp") {
+				var jsonp = s.name || ("SINAREMOTECALLCALLBACK" + ts);
+				// Handle JSONP-style loading
+				window[ jsonp ] = function(){
+					s.onSuccess.apply(this, arguments);
+					s.onComplete.apply(this, arguments);
+					// Garbage collect
+					//window[ jsonp ] = undefined;
+					setTimeout( function(){
+						try {
+							delete window[ jsonp ];
+							if ( head ) {
+								head.removeChild( script );
+							}						
+						}
+						catch (e) {}						
+					}, 500 );
+				}				
+				
+				s.url = s.jsonpUrl( s, jsonp );
+			}else if ( s.data )
+				s.url += (/\?/.test( s.url ) ? "&" : "?") + s.data;
+				
+			script.src = s.url;
+			
+			if ( type == "script" ){
+				var done = false;
+				
+				// Attach handlers for all browsers
+				script.onload = script.onreadystatechange = function(){
+					if ( !done && (!this.readyState ||
+							this.readyState === "loaded" || this.readyState === "complete") ) {
+						done = true;
+						
+						s.onSuccess.apply(this, arguments);
+						s.onComplete.apply(this, arguments);
+
+						// Handle memory leak in IE
+						script.onload = script.onreadystatechange = null;
+						if ( head ) {
+							head.removeChild( script );
+						}
+					}
+				};				
+			}
+			
+/*
+			if ( miniQuery.browser.msie && miniQuery.browser.version == 6 )  
+				setTimeout( function(){
+					head.appendChild( script );	
+				}, 0 );  		
+			else
+*/
+				head.appendChild( script );	  			
+		}
+		
+		return this;		
+	},
+	
+	//interface
+	get		: function( config, callback ){
+		config.method = "GET";
+		return this.ajax( config, callback );
+	},
+	
+	//interface
+	post	: function( config, callback ){
+		config.method = "POST";
+		return this.ajax( config, callback );
+	},
+	
+	getScript	: function( url, data, callback, random ){
+		var config = {
+			type : "script",
+			url  : url,
+			random : random,
+			data : data && !miniQuery.isFunction( data ) ? data : ""
+		};
+		return this.get( config, miniQuery.isFunction( data ) ? data : callback );
+	},
+	
+	getJSON	: function( url, data, callback ){
+		var config = {
+			type : "json",
+			url  : url,
+			data : data && !miniQuery.isFunction( data ) ? data : ""
+		};
+		return this.get( config, miniQuery.isFunction( data ) ? data : callback );
+	},
+		
+	getJSONP	: function( url, invoke, data, callback, name ){
+		var config = {
+			type : "jsonp",
+			url  : url,
+			invoke : invoke,
+			data : data ,
+			name : name || ( invoke.replace( /[.]/g, "" ) )
+		};
+		return this.get( config, callback );
+	}	
+});
+
+// Expose miniQuery to the global object
+window.miniQuery = window.$$ = miniQuery;
+
+})(window);
+
+/* Copyright (c) 2010, SINA Corporation. All rights reserved. */ 

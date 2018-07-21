@@ -1,0 +1,16 @@
+('d:\\python 3.5.4\\lib\\site-packages\\certifi-2017.7.27.1-py3.5.egg',
+ None,
+ {'*.pyc', '*.pyd', '*.pyo', '*.py', '*.so', 'EGG-INFO'},
+ 'DATA',
+ [('certifi\\cacert.pem',
+   'd:\\python '
+   '3.5.4\\lib\\site-packages\\certifi-2017.7.27.1-py3.5.egg\\certifi\\cacert.pem',
+   'DATA'),
+  ('certifi\\old_root.pem',
+   'd:\\python '
+   '3.5.4\\lib\\site-packages\\certifi-2017.7.27.1-py3.5.egg\\certifi\\old_root.pem',
+   'DATA'),
+  ('certifi\\weak.pem',
+   'd:\\python '
+   '3.5.4\\lib\\site-packages\\certifi-2017.7.27.1-py3.5.egg\\certifi\\weak.pem',
+   'DATA')])

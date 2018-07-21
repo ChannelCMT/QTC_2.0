@@ -1,0 +1,12 @@
+安装视频链接：http://study.163.com/course/courseMain.htm?courseId=1005280044&share=2&shareId=400000000478026
+文档网站：www.fxdayu.com
+
+报错请注意版本：
+打开terminal终端，输入pip show bcolz（报错的Package名称）检查版本
+bcol == 1.1.2 需要用wheel 安装
+pip install 直接拉bcolz-1.1.2-cp36-cp36m-win_amd64.whl进去
+pip install rqalpha == 3.0.9
+pip alphalens == 0.1.2
+
+安装报错咨询：
+微信群与大鱼社区：http://bbs.fxdayu.com/

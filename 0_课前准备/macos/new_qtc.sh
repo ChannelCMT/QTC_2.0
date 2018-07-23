@@ -17,6 +17,6 @@ source activate qtc
 
 pip install pip==9.0.1
 pip install -r requirements.txt
-pip uninstall gevent
+pip uninstall -y gevent
 
 rqalpha update_bundle

@@ -1,0 +1,5 @@
+rqalpha==3.0.9
+jaqs-fxdayu
+ta-lib
+alphalens==0.1.2
+jupyter
